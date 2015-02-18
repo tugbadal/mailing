@@ -1,0 +1,141 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>SmartDefter</title>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <title></title>
+</head>
+<body>
+    <script src="{% static 'js/jquery-1.10.2.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/functions.js' %}"></script>
+    <div class="container">
+      <div class="row" >
+        <div class="col-lg-12">
+          <div class="nav box mt30">
+            <a href="/"><img class="logo" src="{% static 'images/smartDefter.png' %}"></a>
+            <ul class="menu">
+              <li><a href="/defter/olustur"><i class="glyphicon glyphicon-edit"></i>Defter Oluştur</a></li>
+              <li><a href="/defter/tum-kayitlar"><i class="glyphicon glyphicon-check"></i>Tüm Kayıtlar </a></li>
+
+            </ul>
+            <div class="pull-right mr5">
+              <a href="/accounts/logout" class="btn btn-sm btn-primary mr10"><i class="glyphicon glyphicon-off"></i>Çıkış Yap</a>
+              <div class="dropdown pull-right">
+                <a href="#" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown">
+                  <i class="glyphicon glyphicon-asterisk"></i>Ayarlar
+                </a>
+                <ul class="dropdown-menu mt10" role="menu" aria-labelledby="drop3">
+                  <li><a role="menuitem" href="/kullanicilar-listesi"><i class="glyphicon glyphicon-user"></i>Kullanıcılar</a></li>
+                  <li><a role="menuitem" href="/belge-tipleri"><i class="glyphicon glyphicon-tags"></i>Tanımlamalar</a></li>
+                  <li><a role="menuitem" href="/sirket-bilgileri"><i class="glyphicon glyphicon-cog"></i>Ayarlar</a></li>
+                  <li><a role="menuitem" href="/uygulama-bilgileri"><i class="glyphicon glyphicon-tasks"></i>Uygulama Bilgileri</a></li>
+                 <!-- <li class="divider"></li>
+                  <li><a role="menuitem" href="set_logs.html"><i class="glyphicon glyphicon-th-list"></i>İşlem Kayıtları</a></li> -->
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-12">
+        {<button class="btn btn-sm btn-success pull-right" onclick="form_adi_degistir('Ekle');" data-toggle="modal" data-target="#belge-add"><i class="glyphicon glyphicon-plus"></i> Yeni Belge Tipi Oluştur</button>
+                <table class="table table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th>Kodu</th>
+                      <th>Adı</th>
+                      <th>XBRL Kodu</th>
+                      <th width="100px">#</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                  {% for document_type in document_types %}
+                    <tr id="document_type_{{ document_type.pk }}">
+                      <td class="document_code"> {{ document_type.document_code }} </td>
+                      <td class="document_name"> {{ document_type.document_name }} </td>
+                      <td class="xbrl_code"> {{ document_type.xbrl_code }} </td>
+                      <td>
+                        <button onclick="edit('{{ document_type.pk }}');" class="btn btn-xs btn-info" rel="tooltip" data-placement="left" title="Düzenle" data-toggle="modal" data-target="#belge-add"><i class="glyphicon glyphicon-edit"></i></button>
+                        <button onclick="targetRecord={{ document_type.id }};$('#deleted_doc_type_code').html(this.dataset['title']); $('#deleted_doc_type_name').html(this.dataset['tittle']);" class="btn btn-xs btn-danger" rel="tooltip" data-placement="top" title="Kaldır" data-tittle="{{ document_type.document_name }}" data-toggle="modal" data-target="#belge-remove"><i class="glyphicon glyphicon-remove"></i></button>
+                        <a href="#" class="btn btn-xs btn-default" rel="tooltip" data-placement="right" title="Pasif"><i class="glyphicon glyphicon-exclamation-sign"></i></a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                  </tbody>
+                </table>
+
+
+
+    <!-- belge-add -->
+    <form action="/belge-tipleri-olustur/" method="post" id="document-type-add">
+        {% csrf_token %}
+        <div class="modal fade" id="belge-add" tabindex="-1" role="dialog" aria-labelledby="belge-addLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="belge-addLabel">Belge Tipi <span id="form_islem">Ekle</span></h4>
+              </div>
+              <div class="modal-body">
+                  {{ document_form.errors }}
+                  <input type="hidden" name="id" value="{{ edited_document_type.pk}}">
+                <label>Kodu</label>
+                 {{ document_form.document_code }}
+                <label class="mt20">Adı</label>
+                  {{ document_form.document_name }}
+                <label class="mt20">XBRL Kodu</label>
+                  {{ document_form.xbrl_code }}
+
+                <div class="row mt20">
+                  <div class="col-xs-2 col-xs-offset-8">
+                    <div class="radio">
+                      <label><input type="radio" name="ap"> Aktif</label>
+                    </div>
+                  </div>
+                  <div class="col-xs-2">
+                    <div class="radio">
+                      <label><input type="radio" name="ap"> Pasif</label>
+                    </div>
+                  </div>
+                </div><!--row-->
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Kapat</button>
+                <input type="submit" class="btn btn-primary btn-sm" value="Değişiklikleri Kaydet">
+              </div>
+            </div>
+          </div>
+        </div>
+    </form>
+
+    <!-- belge-remove -->
+    <div class="modal fade" id="belge-remove" tabindex="-1" role="dialog" aria-labelledby="belge-removeLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="belge-removeLabel">Belge Tipi Sil</h4>
+          </div>
+          <div class="modal-body">
+
+            <em> <span id="deleted_doc_type_code"></span> kodlu <span id="deleted_doc_type_name"></span> </em>  Belge Tipi Silinecek. Devam Etmek İstiyor musunuz?
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal" onclick="deleteRecord();">Evet</button>
+            <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Hayır</button>
+          </div>
+        </div>
+      </div>
+    </div>
+        </div>
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block 'content' %}
+    <header>
+        <h1>Şirket maili ekleme formu</h1>
+    </header>
+    <section class="content">
+        <form method="post" action="/mailekle/">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-xs-4">
+                    <input type="text" class="form-control" name="adi" placeholder="Şirket Adı" value="{{adi}}">
+                </div>
+                <div class="col-xs-4">
+                    <input type="text" class="form-control" name="maili" placeholder="Şirket Maili" value="{{maili}}">
+                </div>
+
+                <!--
+                <div class="col-xs-4">
+                    <input type="text" class="form-control" name="grubu" placeholder="Grubu" value="{{ grubu }}">
+                </div>
+                -->
+                <div class="col-xs-4">
+                    <select class="form-control input-sm" name="grubu"  >
+                      <option class="" value="">Grup Seç</option>
+                      {% for group in groups%}
+                        <option value="{{ group.group_name}}">{{ group.group_name }}</option>
+                      {% endfor %}
+
+                    </select>
+                </div>
+
+
+
+                <div class="clearfix"></div>
+                <hr class="clearfix">
+                <button type="submit" class="btn btn-primary">Ekle</button>
+            </div>
+        </form>
+    </section>
+{% endblock %}
+
